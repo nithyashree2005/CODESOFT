@@ -1,0 +1,49 @@
+/*The goal of this project is to predict the IMDB rating of Indian movies using regression techniques.
+I used a dataset containing movie features such as genre, director, language, runtime, and number of votes.
+After cleaning and encoding the data, I applied a Random Forest Regressor model. The performance was measured using R² Score and Mean Absolute Error to understand the accuracy of the predictions.
+
+*/
+# Movie Rating Prediction using Regression
+
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_absolute_error, r2_score
+
+# Load dataset
+df = pd.read_csv("IMDb Indian Movies.csv")  # Ensure this file is in your directory
+
+# Drop rows with missing target values
+df.dropna(subset=['IMDB Rating'], inplace=True)
+
+# Select useful columns
+df = df[['Genre', 'Director', 'Language', 'Runtime', 'IMDB Rating', 'Votes']]
+
+# Handle missing values
+df.dropna(inplace=True)
+
+# Encode categorical features
+df['Genre'] = df['Genre'].astype('category').cat.codes
+df['Director'] = df['Director'].astype('category').cat.codes
+df['Language'] = df['Language'].astype('category').cat.codes
+
+# Features and target
+X = df.drop('IMDB Rating', axis=1)
+y = df['IMDB Rating']
+
+# Train-test split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Model
+model = RandomForestRegressor(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)
+
+# Prediction & Evaluation
+y_pred = model.predict(X_test)
+
+print("R² Score:", r2_score(y_test, y_pred))
+print("Mean Absolute Error:", mean_absolute_error(y_test, y_pred))
